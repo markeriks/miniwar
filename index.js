@@ -9,57 +9,46 @@ const remainingText = document.getElementById("remaining")
 const computerScoreEl = document.getElementById("computer-score")
 const myScoreEl = document.getElementById("my-score")
 
-function handleClick() {
-    fetch("https://deckofcardsapi.com/api/deck/new/shuffle/")
-        .then(res => res.json())
-        .then(data => {
-            remainingText.textContent = `Remaining cards: ${data.remaining}`
-            deckId = data.deck_id
-            header.textContent = "Game of War"
-            computerScoreEl.textContent = "Computer score: 0"
-            myScoreEl.textContent = "My score: 0"
-            cardsContainer.innerHTML = `
-            <div class="card-slot"></div>
-            <div class="card-slot"></div>`
-            drawCardBtn.disabled = false
-        })
+async function handleClick() {
+    const response = await fetch("https://deckofcardsapi.com/api/deck/new/shuffle/")
+    const data = await response.json()
+    remainingText.textContent = `Remaining cards: ${data.remaining}`
+    deckId = data.deck_id
+    header.textContent = "Game of War"
+    computerScoreEl.textContent = "Computer score: 0"
+    myScoreEl.textContent = "My score: 0"
+    cardsContainer.innerHTML = `
+    <div class="card-slot"></div>
+    <div class="card-slot"></div>`
+    drawCardBtn.disabled = false
 }
 
 newDeckBtn.addEventListener("click", handleClick)
 
-drawCardBtn.addEventListener("click", () => {
-    fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=2`)
-        .then(res => res.json())
-        .then(data => {
-            remainingText.textContent = `Remaining cards: ${data.remaining}`
-            cardsContainer.children[0].innerHTML = `
-                <img src=${data.cards[0].image} class="card" />
-            `
-            cardsContainer.children[1].innerHTML = `
-                <img src=${data.cards[1].image} class="card" />
-            `
-            const winnerText = determineCardWinner(data.cards[0], data.cards[1])
-            header.textContent = winnerText
-            
-            if (data.remaining === 0) {
-                drawCardBtn.disabled = true
-                if (computerScore > myScore) {
-                    header.textContent = "The computer won the game!"
-                } else if (myScore > computerScore) {
-                    header.textContent = "You won the game!"
-                } else {
-                    header.textContent = "It's a tie game!"
-                }
-            }
-        })
+drawCardBtn.addEventListener("click", async () => {
+    const response = await fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=2`)
+    const data = await response.json()
+    remainingText.textContent = `Remaining cards: ${data.remaining}`
+    cardsContainer.children[0].innerHTML = `
+        <img src=${data.cards[0].image} class="card" />
+    `
+    cardsContainer.children[1].innerHTML = `
+        <img src=${data.cards[1].image} class="card" />
+    `
+    const winnerText = determineCardWinner(data.cards[0], data.cards[1])
+    header.textContent = winnerText
+    
+    if (data.remaining === 0) {
+        drawCardBtn.disabled = true
+        if (computerScore > myScore) {
+            header.textContent = "The computer won the game!"
+        } else if (myScore > computerScore) {
+            header.textContent = "You won the game!"
+        } else {
+            header.textContent = "It's a tie game!"
+        }
+    }
 })
-
-/**
- * Challenge:
- * 
- * Display the final winner in the header at the top by
- * replacing the text of the h2.
- */
 
 function determineCardWinner(card1, card2) {
     const valueOptions = ["2", "3", "4", "5", "6", "7", "8", "9", 
