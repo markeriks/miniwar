@@ -4,6 +4,12 @@ This is a simple browser-based card game inspired by the classic card game *War*
 
 ---
 
+## 🔗 Live Site
+
+[Visit the live site on Netlify](https://warmini.netlify.app/)
+
+---
+
 ## 🎮 How to Play
 
 1. Click **"New Deck"** to start a new game.
